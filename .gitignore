@@ -23,3 +23,28 @@ go.work.sum
 
 # env file
 .env
+
+# node_modules
+node_modules
+
+# dist
+dist
+
+# build
+build
+
+# cache
+cache
+
+# logs
+logs
+
+# temp
+temp
+
+# serviceAccountKey.json
+serviceAccountKey.json
+
+# .env.local
+.env.local
+
