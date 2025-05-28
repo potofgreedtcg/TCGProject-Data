@@ -26,79 +26,79 @@ func GetCSVData(uri string) ([]byte, error) {
 	return body, nil
 }
 
-func GetGameData() ([]dataTypes.GameData, error) {
-	fmt.Println("========= Getting Game Data =========")
+func getCategoriesData() ([]dataTypes.CategoryData, error) {
+	fmt.Println("========= Getting Category Data =========")
 	Uri := "https://tcgcsv.com/tcgplayer/categories"
 	buffer, err := GetCSVData(Uri)
 	if err != nil {
-		fmt.Println("GetGame CSVData Error:", err)
+		fmt.Println("GetCategory CSVData Error:", err)
 		return nil, err
 	}
 
-	var csvData dataTypes.GameDataResponse
+	var csvData dataTypes.CategoriesDataResponse
 	err = json.Unmarshal(buffer, &csvData)
 	if err != nil {
-		fmt.Println("GetGame Unmarshal Error:", err)
+		fmt.Println("GetCategory Unmarshal Error:", err)
 		return nil, err
 	}
 
-	fmt.Printf("========= Found %d Game Data =========\n", csvData.TotalItems)
+	fmt.Printf("========= Found %d Category Data =========\n", csvData.TotalItems)
 
-	firebase.UpdateGameDataToArray(&csvData.Results, "Categories", "Games")
+	firebase.UpdateCategoriesDataToArray(&csvData.Results, "Categories", "Games")
 
-	fmt.Println("========= Uploaded Game Data to Firebase =========")
+	fmt.Println("========= Uploaded Category Data to Firebase =========")
 
 	return csvData.Results, nil
 }
 
-func GetSetData(gameId string) ([]dataTypes.SetData, error) {
-	fmt.Printf("========= Getting Set Data for %s =========\n", gameId)
+func GetGroupsData(categoryId string) ([]dataTypes.GroupData, error) {
+	fmt.Printf("========= Getting Groups Data for %s =========\n", categoryId)
 
-	Uri := "https://tcgcsv.com/tcgplayer/" + gameId + "/groups"
+	Uri := "https://tcgcsv.com/tcgplayer/" + categoryId + "/groups"
 	buffer, err := GetCSVData(Uri)
 	if err != nil {
-		fmt.Println("GetSet CSVData Error:", err)
+		fmt.Println("GetGroups CSVData Error:", err)
 		return nil, err
 	}
 
-	var csvData dataTypes.SetDataResponse
+	var csvData dataTypes.GroupsDataResponse
 	err = json.Unmarshal(buffer, &csvData)
 	if err != nil {
-		fmt.Println("GetSet Unmarshal Error:", err)
+		fmt.Println("GetGroups Unmarshal Error:", err)
 		return nil, err
 	}
-	fmt.Printf("========= Found %d Set Data =========\n", csvData.TotalItems)
+	fmt.Printf("========= Found %d Groups Data =========\n", csvData.TotalItems)	
 	
-	firebase.UpdateSetDataToArray(&csvData.Results, "Sets", gameId)
+	firebase.UpdateGroupsDataToArray(&csvData.Results, "Groups", categoryId)
 
-	fmt.Printf("========= Uploaded Set Data to Firebase for %s =========\n", gameId)
+	fmt.Printf("========= Uploaded Groups Data to Firebase for %s =========\n", categoryId)
 
 	return csvData.Results, nil
 }
 
-func GetProductData(categoryId string, groupId string) ([]dataTypes.ProductData, error) {
+func GetProductsData(categoryId string, groupId string) ([]dataTypes.ProductData, error) {
 	fmt.Printf("========= Getting Product Data for %s - %s =========\n", categoryId, groupId)
 
 	Uri := "https://tcgcsv.com/tcgplayer/" + categoryId + "/" + groupId + "/products"
 	buffer, err := GetCSVData(Uri)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("GetProducts CSVData Error:", err)
 		return nil, err
 	}
 
 	// Convert []byte to struct
-	var csvData dataTypes.ProductDataResponse
+	var csvData dataTypes.ProductsDataResponse
 	err = json.Unmarshal(buffer, &csvData)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("GetProducts Unmarshal Error:", err)
 		return nil, err
 	}
 
-	fmt.Printf("========= Found %d Product Data =========\n", csvData.TotalItems)
+	fmt.Printf("========= Found %d Products Data =========\n", csvData.TotalItems)
 	
-	firebase.UpdateProductDataToArray(&csvData.Results, categoryId, groupId)
+	firebase.UpdateProductsDataToArray(&csvData.Results, categoryId, groupId)
 
-	fmt.Printf("========= Uploaded Product Data to Firebase for %s - %s =========\n", categoryId, groupId)
+	fmt.Printf("========= Uploaded Products Data to Firebase for %s - %s =========\n", categoryId, groupId)
 
 
 	return csvData.Results, nil

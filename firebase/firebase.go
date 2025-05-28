@@ -6,6 +6,8 @@ import (
     "fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
+	"unicode"
 	os "os"
 		
     firebase "firebase.google.com/go/v4"
@@ -13,9 +15,6 @@ import (
     "cloud.google.com/go/firestore"
     dataTypes "github.com/potofgreedtcg/TCGProject-Data/dataTypes"
 )
-
-
-
 
 func InitializeFirebase() (*firebase.App, error) {
 
@@ -42,9 +41,8 @@ func GetFirestoreClient(app *firebase.App) (*firestore.Client, error) {
     return client, nil
 }
 
-
 // Update Game Data to Array in Firestore document
-func UpdateGameDataToArray(data *[]dataTypes.GameData, Collection string, document string) {
+func UpdateCategoriesDataToArray(data *[]dataTypes.CategoryData, Collection string, document string) {
     app, err := InitializeFirebase()
     if err != nil {
 		log.Printf("Error setting document: %v\n", err)
@@ -67,7 +65,7 @@ func UpdateGameDataToArray(data *[]dataTypes.GameData, Collection string, docume
 }
 
 // Update Set Data to Array in Firestore document
-func UpdateSetDataToArray(data *[]dataTypes.SetData, Collection string, document string) {
+func UpdateGroupsDataToArray(data *[]dataTypes.GroupData, Collection string, document string) {
 
     app, err := InitializeFirebase()
     if err != nil {
@@ -81,6 +79,23 @@ func UpdateSetDataToArray(data *[]dataTypes.SetData, Collection string, document
 
 	defer client.Close()
 
+    for _, group := range *data {
+        cleaned := cleanString(group.Name)
+
+		filePath := fmt.Sprintf("images/groups/")
+		filename := fmt.Sprintf("%s%d.jpg", filePath, group.GroupId)
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			os.MkdirAll(filePath, 0755)
+		}
+
+		groupUrl := fmt.Sprintf("https://tcgplayer-cdn.tcgplayer.com/set_icon/%s.png", cleaned)
+		err := SaveImage(groupUrl, filename)
+		if err != nil {
+			log.Printf("Error downloading image for Group %d: %v", group.GroupId, err)
+		}
+		fmt.Printf("Downloaded image for Group %d\n", group.GroupId)
+	}
+
     // Set the array in the document
     _, err = client.Collection(Collection).Doc(document).Set(context.Background(), map[string]interface{}{
         "results": data,
@@ -91,7 +106,7 @@ func UpdateSetDataToArray(data *[]dataTypes.SetData, Collection string, document
 	
 }
 
-func UpdateProductDataToArray(data *[]dataTypes.ProductData, Collection string, document string) {
+func UpdateProductsDataToArray(data *[]dataTypes.ProductData, Collection string, document string) {
     app, err := InitializeFirebase()
     if err != nil {
 		log.Printf("Error setting document: %v\n", err)
@@ -166,44 +181,12 @@ func DownloadImage(url string) ([]byte, error) {
     return imageBytes, nil
 }
 
-
-// Update collection
-// func BatchUpdateGameData(data *[]dataTypes.GameData) {
-
-//     app, err := InitializeFirebase()
-//     if err != nil {
-//         log.Printf("Error initializing Firebase: %v\n", err)
-//         return
-//     }
-
-//     client, err := GetFirestoreClient(app)
-//     if err != nil {
-//         log.Printf("Error getting Firestore client: %v\n", err)
-//         return
-//     }
-
-// 	defer client.Close()
-// 	batch := client.Batch()
-
-// 	batchLimit := 500
-// 	for index, value := range *data {
-// 		fmt.Println(index, value)
-// 		docRef := client.Collection("Games").Doc(value.Name)
-// 		batch.Set(docRef, value)
-// 		if index % batchLimit == 0 {
-// 			_, err = batch.Commit(context.Background())
-// 			if err != nil {
-// 				log.Fatalf("Failed to commit batch: %v", err)
-// 			}
-// 			batch = client.Batch()
-// 		}
-// 	}
-
-// 	// Commit the batch
-// 	_, err = batch.Commit(context.Background())
-// 	if err != nil {
-// 		log.Fatalf("Failed to commit batch: %v", err)
-// 	}
-
-// 	fmt.Println("Batch write successful!")
-// }
+func cleanString(input string) string {
+	var builder strings.Builder
+	for _, r := range input {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}

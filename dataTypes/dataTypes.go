@@ -1,13 +1,13 @@
 package dataTypes
 
-type GameDataResponse struct {
+type CategoriesDataResponse struct {
     TotalItems int        `json:"totalItems"`
     Success    bool       `json:"success"`
     Errors     []string   `json:"errors"`
-    Results    []GameData `json:"results"`
+    Results    []CategoryData `json:"results"`
 }
 
-type GameData struct {
+type CategoryData struct {
     CategoryId          int    `json:"categoryId"`
     Name               string `json:"name"`
     ModifiedOn         string `json:"modifiedOn"`
@@ -23,14 +23,14 @@ type GameData struct {
     IsDirect           bool   `json:"isDirect"`
 }
 
-type SetDataResponse	 struct{
+type GroupsDataResponse	 struct{
 	TotalItems int        `json:"totalItems"`
 	Success    bool       `json:"success"`
 	Errors     []string   `json:"errors"`
-	Results    []SetData  `json:"results"`
+	Results    []GroupData  `json:"results"`
 }
 
-type SetData struct{
+type GroupData struct{
 	GroupId          int    `json:"groupId"`
 	Name             string `json:"name"`
 	Abbreviation     string `json:"abbreviation"`
@@ -40,7 +40,7 @@ type SetData struct{
 	CategoryId       int    `json:"categoryId"`
 }
 
-type ProductDataResponse struct{
+type ProductsDataResponse struct{
 	TotalItems int        `json:"totalItems"`
 	Success    bool       `json:"success"`
 	Errors     []string   `json:"errors"`
