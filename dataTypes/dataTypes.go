@@ -64,3 +64,22 @@ type ProductData struct{
 	} `json:"presaleInfo"`
     ExtendedData []map[string]interface{} `json:"extendedData"`
 }
+
+
+type PriceDataResponse struct{
+	TotalItems int        `json:"totalItems"`
+	Success    bool       `json:"success"`
+	Errors     []string   `json:"errors"`
+	Results    []PriceData  `json:"results"`
+}
+
+type PriceData struct{
+	ProductId     int     `json:"productId"`
+	LowPrice      float64 `json:"lowPrice"`
+	MidPrice      float64 `json:"midPrice"`
+	HighPrice     float64 `json:"highPrice"`
+	MarketPrice   float64 `json:"marketPrice"`
+	DirectLowPrice float64 `json:"directLowPrice"`
+	SubTypeName   string  `json:"subTypeName"`
+	Date          string  `json:"date"`
+}

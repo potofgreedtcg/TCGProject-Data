@@ -103,3 +103,31 @@ func GetProductsData(categoryId string, groupId string) ([]dataTypes.ProductData
 
 	return csvData.Results, nil
 }
+
+func GetPriceData(categoryId string, groupId string) ([]dataTypes.PriceData, error) {
+	fmt.Printf("========= Getting Price Data for %s - %s =========\n", categoryId, groupId)
+
+	Uri := "https://tcgcsv.com/tcgplayer/" + categoryId + "/" + groupId + "/prices"
+	buffer, err := GetCSVData(Uri)
+	if err != nil {
+		fmt.Println("GetPrice CSVData Error:", err)
+		return nil, err
+	}
+
+	// Convert []byte to struct
+	var csvData dataTypes.PriceDataResponse
+	err = json.Unmarshal(buffer, &csvData)
+	if err != nil {
+		fmt.Println("GetPrice Unmarshal Error:", err)
+		return nil, err
+	}
+
+	fmt.Printf("========= Found %d Price Data =========\n", csvData.TotalItems)
+	
+	firebase.UpdatePriceDataToArray(csvData.Results, groupId)
+
+	fmt.Printf("========= Uploaded Price Data to Firebase for %s - %s =========\n", categoryId, groupId)
+
+
+	return csvData.Results, nil
+}

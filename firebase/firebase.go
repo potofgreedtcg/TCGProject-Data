@@ -9,7 +9,8 @@ import (
 	"strings"
 	"unicode"
 	os "os"
-		
+	"strconv"
+	"time"
     firebase "firebase.google.com/go/v4"
     "google.golang.org/api/option"
     "cloud.google.com/go/firestore"
@@ -141,6 +142,30 @@ func UpdateProductsDataToArray(data *[]dataTypes.ProductData, Collection string,
     if err != nil {
         log.Println("error setting array: %v", err)
     }
+}
+
+func UpdatePriceDataToArray(data []dataTypes.PriceData, document string) {
+    app, err := InitializeFirebase()
+    if err != nil { log.Printf("Error setting document: %v\n", err) }
+
+    client, err := GetFirestoreClient(app)
+    if err != nil { log.Printf("Error getting Firestore client: %v\n", err) }
+
+	defer client.Close()
+
+    myMap := make(map[string]dataTypes.PriceData) // Map with string keys and int values
+
+    for _, value := range data {
+        fmt.Printf("Price Data: %d\n", value.ProductId)
+        value.Date = time.Now().Format("2006-01-02")
+        myMap[strconv.Itoa(value.ProductId)] = value // Use the element as key, index as value
+    }
+
+    // Set the array in the document
+    _, err = client.Collection("Prices").Doc(document).Set(context.Background(), map[string]interface{}{
+        "results": myMap,
+    })
+    if err != nil { log.Println("error setting array: %v", err) }
 }
 
 func SaveImage(url string, filename string) error {

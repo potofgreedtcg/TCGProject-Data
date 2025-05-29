@@ -34,7 +34,13 @@ func main() {
 	// }
 
 
-	// for _, set := range setCsvData {
+
+	for _, group := range groupsCsvData {
+		priceCsvData, err := dataParser.GetPriceData(strconv.Itoa(group.CategoryId), strconv.Itoa(group.GroupId))
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
 	// 	fmt.Printf("Product Data: %d - %d \n", set.CategoryId, set.GroupId)
 	// 	productCsvData, err := dataParser.GetProductsData(strconv.Itoa(set.CategoryId), strconv.Itoa(set.GroupId))
 	// 	if err != nil {
@@ -42,9 +48,11 @@ func main() {
 	// 		os.Exit(1)
 	// 	}
 	// 	fmt.Printf("Product Items: %d \n", len(productCsvData))
-	// }
+		fmt.Printf("Price Items: %d \n", len(priceCsvData))
+
+	}
 	
-	
+
 	fmt.Println("========= Finished Data Updating =========")
 	duration := time.Since(start)
 	hours := int(duration.Hours())
